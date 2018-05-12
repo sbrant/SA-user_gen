@@ -11,11 +11,14 @@ import random
 import re
 import json
 import time
+import os
 from utils import parse
 from splunklib.client import connect
 from splunklib.searchcommands import dispatch, ReportingCommand, Configuration
 
-def randomWords(num, dictionary="/four/splunk/etc/apps/SA-ctf_scoreboard_admin/appserver/static/war"):
+splunkhome = os.environ['SPLUNK_HOME']
+
+def randomWords(num, dictionary=splunkhome+"/etc/apps/SA-user_gen/appserver/static/war"):
     r = random.SystemRandom()
     try:
         f = open(dictionary, "r")
@@ -44,7 +47,7 @@ def createColl(comp):
     cname = comp+'-'+etime
     opts = parse(sys.argv[1:], {}, ".splunkrc")
     opts.kwargs["owner"] = "nobody"
-    opts.kwargs["app"] = "SA-Usergen"
+    opts.kwargs["app"] = "SA-user_gen"
     service = connect(**opts.kwargs)
     service.kvstore.create(cname)
 
