@@ -1,0 +1,66 @@
+<form>
+  <label>User Configuration</label>
+  <fieldset submitButton="true">
+    <input type="text" token="num_players">
+      <label>Number of Contestants</label>
+    </input>
+    <input type="text" token="comp_short">
+      <label>Short Name for Competition</label>
+    </input>
+    <input type="dropdown" token="comp_type">
+      <label>Competition Type</label>
+      <choice value="botsv1">BOTS v1</choice>
+      <choice value="botsv2">BOTS v2</choice>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <title>User Configuration Guidance</title>
+      <html>
+        <b>Number of Contestants</b>: The maximum number of contestants expected for the competition (Maybe a few more if you think you might get some walk-ins)<br/>
+        <i>Example:</i> <u>25</u>
+        <br/>
+        <br/>
+        <b>Short Name For Competition</b> (no spaces): This is a name of your choosing, it will be the name that becomes part of the URL<br/>
+        <i>Example:</i> <u>FMLA</u> (short for Field Marketing Los Angeles)<br/>
+        <br/>
+<!--
+        <b>Scoring Server</b>: This is the host name for the scoring server<br/>
+        <i>Example:</i> <u>od-bots-fmla-scoring.splunkoxygen.com</u>
+        <br/>
+        <br/>
+        <b>Gaming Server Template</b>: This is the template string for the gaming server, 'XX' takes the place of the server number<br/>
+        <i>Example:</i> <u>od-bots-fmla-XX.splunkoxygen.com</u> (The number of servers required will be calculated and the XX replaced in the server name<br/>
+        <br/>
+-->
+        <b>Competition Type</b>: This will determine the image used and number of gaming servers required<br/>
+        <br/>
+      </html>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <table>
+        <search>
+          <query>| makeresults 1 
+| eval contestants=$num_players$, compname="$comp_short$", scoring="od-"."$comp_short$"."-scoring.splunkoxygen.com", gaming="od-"."$comp_short$"."-XX.splunkoxygen.com", comptype="$comp_type$" 
+| table contestants compname scoring gaming comptype
+| usergen</query>
+          <earliest>-24h@h</earliest>
+          <latest>now</latest>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="rowNumbers">true</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <html>
+          <p>
+            <a href="" class="btn btn-primary" target="_blank">OK, I'm satisfied. Make it so.</a> 
+          </p>
+      </html>
+    </panel>
+  </row>
+</form>

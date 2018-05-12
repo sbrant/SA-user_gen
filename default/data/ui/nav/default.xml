@@ -1,0 +1,6 @@
+<nav search_view="search">
+  <view name="search" />
+  <view name="datasets" />
+  <view name="user_config" default='true' />
+  <view name="dashboards" />
+</nav>
