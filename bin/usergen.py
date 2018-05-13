@@ -50,6 +50,7 @@ def createColl(comp):
     opts.kwargs["app"] = "SA-user_gen"
     service = connect(**opts.kwargs)
     service.kvstore.create(cname)
+    return cname
 
 
 @Configuration()
@@ -61,11 +62,17 @@ class userGenCommand(ReportingCommand):
     def reduce(self, records):
         for record in records:
             eventname = record['compname']
-            createColl(eventname)
+            kvs_coll = createColl(eventname)
+            opts = parse(sys.argv[1:], {}, ".splunkrc")
+            opts.kwargs["owner"] = "nobody"
+            opts.kwargs["app"] = "SA-user_gen"
+            service = connect(**opts.kwargs)
+            collection = service.kvstore[kvs_coll]
             # write relevant fields, from each record, to KVStore
             for user_entry in range(1, int(record['contestants'])+1):
-                yield {'password': genPassword(), 'scoringurl': record['scoring'], 'gamingurl': record['gaming'], 'event': eventname, 'username': 'user'+str(user_entry)+'-'+record['compname']}
+                collection.data.insert(json.dumps( {'password': genPassword(), 'scoringurl': record['scoring'], 'gamingurl': record['gaming'], 'event': eventname, 'username': 'user'+str(user_entry)+'-'+record['compname']}))
             # return the contents lookup
+                yield {'_key': user_entry, 'password': genPassword(), 'scoringurl': record['scoring'], 'gamingurl': record['gaming'], 'event': eventname, 'username': 'user'+str(user_entry)+'-'+record['compname']}
 
 if __name__ == "__main__":
    dispatch(userGenCommand, sys.argv, sys.stdin, sys.stdout, __name__)
