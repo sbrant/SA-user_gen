@@ -70,9 +70,9 @@ class userGenCommand(ReportingCommand):
             collection = service.kvstore[kvs_coll]
             # write relevant fields, from each record, to KVStore
             for user_entry in range(1, int(record['contestants'])+1):
-                collection.data.insert(json.dumps({"password": genPassword(), "scoringurl": record['scoring'], "gamingurl": record['gaming'], "event": eventname, "username": 'user'+str(user_entry)+'-'+record['compname']}))
+            #    collection.data.insert(json.dumps({"password": genPassword(), "scoringurl": record['scoring'], "gamingurl": record['gaming'], "event": eventname, "username": 'user'+str(user_entry)+'-'+record['compname']}))
             # return the contents lookup
-                yield {'password': genPassword(), 'scoringurl': record['scoring'], 'gamingurl': record['gaming'], 'event': eventname, 'username': 'user'+str(user_entry)+'-'+record['compname']}
+                yield {'password': genPassword(), 'scoringurl': record['scoring'], 'gamingurl': record['gaming'], 'event': eventname, 'username': 'user'+str(user_entry)+'-'+record['compname'], 'kvs': kvs_coll}
 
 if __name__ == "__main__":
    dispatch(userGenCommand, sys.argv, sys.stdin, sys.stdout, __name__)
