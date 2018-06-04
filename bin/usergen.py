@@ -67,7 +67,7 @@ class userGenCommand(ReportingCommand):
             eventname = record['compname']
             kvs_coll = createColl(eventname)
             lookup_csv = open(os.path.join(lookupshome, kvs_coll + ".csv"), "w")
-            fieldnames = ["password", "scoringurl", "gamingurl", "event", "username"]
+            fieldnames = ["password", "scoringurl", "gamingurl", "event", "username", "comptype"]
             csv_writer = csv.DictWriter(lookup_csv, fieldnames=fieldnames)
             csv_writer.writeheader()
             #opts = parse(sys.argv[1:], {}, ".splunkrc")
@@ -75,12 +75,17 @@ class userGenCommand(ReportingCommand):
             #opts.kwargs["app"] = "SA-user_gen"
             #service = connect(**opts.kwargs)
             #collection = service.kvstore[kvs_coll]
-            for user_entry in range(1, int(record['contestants'])+1):
+            contestants = int(record['contestants'])
+            if record['comptype'] == "botsv1":
+                gservers = (contestants / 8)+1
+            elif record['comptype'] == "botsv2":
+                gservers = (contestants / 4)+1 
+            for user_entry in range(1, contestants+1):
                 passwd = genPassword()
-                collection_data = {"password": passwd, "scoringurl": record['scoring'], "gamingurl": record['gaming'], "event": eventname, "username": 'user'+str(user_entry)+'-'+record['compname']}
+                collection_data = {"password": passwd, "scoringurl": record['scoring'], "gamingurl": record['gaming'], "event": eventname, "username": 'user'+str(user_entry)+'-'+record['compname'], "comptype": record['comptype']}
                 csv_writer.writerow(collection_data)
                 #collection.data.insert(collection_data)
-                yield {'password': passwd, 'scoringurl': record['scoring'], 'gamingurl': record['gaming'], 'event': eventname, 'username': 'user'+str(user_entry)+'-'+record['compname']}
+                yield {'password': passwd, 'scoringurl': record['scoring'], 'gamingurl': record['gaming'], 'event': eventname, 'username': 'user'+str(user_entry)+'-'+record['compname'], 'gaming_servers': gservers}
             lookup_csv.close()
 
 
