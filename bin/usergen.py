@@ -85,25 +85,25 @@ class userGenCommand(ReportingCommand):
             gservers = gameServers(contestants, record['comptype'])
             for user_entry in range(1, contestants+1):
                 passwd = genPassword()
-                collection_data = {"password": passwd,         \
-                        "scoringurl": record['scoring'],       \
-                        "gamingurl": record['gaming'],         \
-                        "event": eventname,                    \
-                        "username": 'user'+str(user_entry)+'-'+record['compname'], \
-                        "comptype": record['comptype'], "gaming_servers": gservers}
-                csv_writer.writerow(collection_data)
-                #collection.data.insert(collection_data)
                 tic = 1
                 while tic <= gservers:
                     gurl = str(record['gaming'])
                     ftic = "{:0>2d}".format(tic)
                     fgurl = gurl.replace("XX",ftic)
-                    yield {'password': passwd,                 \
-                            'scoringurl': record['scoring'],   \
-                            'gamingurl': fgurl,                \
-                            'event': eventname,                \
-                            'username': 'user'+str(user_entry)+'-'+record['compname']}
+                    collection_data = {"password": passwd,         \
+                            "scoringurl": record['scoring'],       \
+                            "gamingurl": fgurl,         \
+                            "event": eventname,                    \
+                            "username": 'user'+str(user_entry)+'-'+record['compname'], \
+                            "comptype": record['comptype'], "gaming_servers": gservers}
                     tic+=1
+                csv_writer.writerow(collection_data)
+                #collection.data.insert(collection_data)
+                yield {'password': passwd,                 \
+                        'scoringurl': record['scoring'],   \
+                        'gamingurl': fgurl,                \
+                        'event': eventname,                \
+                        'username': 'user'+str(user_entry)+'-'+record['compname']}
             lookup_csv.close()
 
 
