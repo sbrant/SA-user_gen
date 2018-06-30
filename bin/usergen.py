@@ -62,6 +62,12 @@ def gameServers(users, version):
         gs = (users / 4)+1
     return gs
 
+def gameUrl(url):
+    for x in xrange(url):
+        fx = "{:0>2d}".format(x)
+        furl = url.replace('XX',fx)
+        yield furl
+
 @Configuration()
 class userGenCommand(ReportingCommand):
     @Configuration()
@@ -92,9 +98,9 @@ class userGenCommand(ReportingCommand):
                     fgurl = gurl.replace("XX",ftic)
                     collection_data = {"password": passwd,         \
                             "scoringurl": record['scoring'],       \
-                            "gamingurl": fgurl,         \
+                            "gamingurl": str(gameUrl(gurl)),         \
                             "event": eventname,                    \
-                            "username": 'user'+str(user_entry)+'-'+record['compname'], \
+                            "username": 'user{}-{}'.format(str(user_entry), record['compname']), \
                             "comptype": record['comptype'], "gaming_servers": gservers}
                     tic+=1
                 csv_writer.writerow(collection_data)
@@ -103,7 +109,7 @@ class userGenCommand(ReportingCommand):
                         'scoringurl': record['scoring'],   \
                         'gamingurl': fgurl,                \
                         'event': eventname,                \
-                        'username': 'user'+str(user_entry)+'-'+record['compname']}
+                        'username': 'user{}-{}'.format(str(user_entry), record['compname'])}
             lookup_csv.close()
 
 
