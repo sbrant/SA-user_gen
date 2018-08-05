@@ -1,0 +1,106 @@
+<form script="create_user_list.js">
+  <label>User List Manager</label>
+  <fieldset submitButton="false">
+    <input type="link" token="mode">
+      <label>User List Management</label>
+      <choice value="create">Create</choice>
+      <choice value="view">View</choice>
+      <change>
+        <condition value="create">
+          <set token="showcreate">true</set>
+          <unset token="showview"></unset>
+        </condition>
+        <condition value="view">
+          <set token="showview">true</set>
+          <unset token="showcreate"></unset>
+        </condition>
+      </change>
+      <initialValue>view</initialValue>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <title>Local User Lists</title>
+      <html>
+          <button class="btn btn-primary" id="btn_refreshuserlist">Refresh List</button>
+      </html>
+      <table>
+        <search id="userlists">
+          <query>
+            
+            | rest /services/data/lookup-table-files/ 
+            | search eai:acl.app="SA-user_gen" title=userlist*
+            | rex field=title "userlist-(?&lt;event&gt;[^-]+).csv" 
+            | eval event_and_date=event . " - " . created_string 
+            | table event title
+            
+          </query>
+          <earliest>0</earliest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="count">20</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="percentagesRow">false</option>
+        <option name="rowNumbers">false</option>
+        <option name="totalsRow">false</option>
+        <option name="wrap">true</option>
+        <drilldown>
+          <set token="showview">true</set>
+          <unset token="showcreate"></unset>
+          <set token="viewuserlist">$row.title$</set>
+        </drilldown>
+      </table>
+    </panel>
+    <panel depends="$showcreate$">
+      <title>Create New User List</title>
+      <input id="cnul_input_1" type="text" token="numplayers">
+        <label>Number of Users</label>
+        <default>100</default>
+      </input>
+      <input id="cnul_input_2" type="text" token="pwlen">
+        <label>Number of words in passphrase.</label>
+        <default>2</default>
+      </input>
+      <input id="cnul_input_3" type="text" token="scoringurl">
+        <label>Scoring URL</label>
+      </input>
+      <input id="cnul_input_4" type="text" token="searchurls">
+        <label>Search URLs (Comma separated)</label>
+      </input>
+      <input id="cnul_input_5" type="text" token="eventname">
+        <label>Name of Event</label>
+      </input>
+      <input id="cnul_input_6" type="text" token="userlistname">
+        <label>Save this user list as...</label>
+        <prefix>userlist-</prefix>
+      </input>
+      <html>
+      <button class="btn btn-primary" id="btn_mkuserlist">Create User List</button>
+      </html>
+      <table>
+        <title>User List Creation Results</title>
+        <search id="usergenresults">
+          <query>$doesnotexist$</query>
+          <earliest>-24h@h</earliest>
+          <latest>now</latest>
+        </search>
+        <option name="count">5</option>
+        <option name="drilldown">none</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="rowNumbers">true</option>
+      </table>
+    </panel>
+    <panel depends="$showview$">
+      <title>Preview / Download</title>
+      <table>
+        <search>
+          <query>| inputlookup $viewuserlist$ | fields DisplayUsername, Team, Password, Email, ScoringUrl, SearchUrl, Usernam, Event</query>
+          <earliest>-24h@h</earliest>
+          <latest>now</latest>
+        </search>
+        <option name="drilldown">none</option>
+      </table>
+    </panel>
+  </row>
+</form>

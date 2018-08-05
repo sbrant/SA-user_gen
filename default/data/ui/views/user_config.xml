@@ -1,5 +1,5 @@
 <form>
-  <label>User Configuration</label>
+  <label>Deprecated - User Configuration</label>
   <fieldset submitButton="true">
     <input type="text" token="num_players">
       <label>Number of Contestants</label>
@@ -51,6 +51,7 @@
         </search>
         <option name="drilldown">none</option>
         <option name="rowNumbers">true</option>
+        <fields>["event","username","password","scoringurl","gamingurl"]</fields>
       </table>
     </panel>
   </row>

@@ -1,0 +1,53 @@
+<form script="user_creation.js">
+  <label>User Creator</label>
+  <fieldset submitButton="true" autoRun="false">
+    <input type="dropdown" token="userlist">
+        <label>User List</label>
+        <fieldForLabel>event</fieldForLabel>
+        <fieldForValue>title</fieldForValue>
+        <search>
+          <query>| rest /services/data/lookup-table-files/ 
+| search eai:acl.app="SA-user_gen" title=userlist*
+| rex field=title "userlist-(?&lt;event&gt;[^-]+).csv" 
+| eval event_and_date=event . " - " . created_string 
+| table event title</query>
+        </search>
+      </input>
+      <input id="input_1" type="text" token="role">
+        <label>Role</label>
+        <default>ctf_competitor</default>
+      </input>
+      <input id="input_2" type="text" token="username">
+        <label>Username</label>
+        <default>admin</default>
+      </input>
+      <input id="input_3" type="password" token="password">
+        <label>Password</label>
+      </input>
+      <input id="input_4" type="text" token="port">
+        <label>Splunkd Port</label>
+        <default>8089</default>
+      </input>
+      <input id="input_5" type="radio" token="action">
+        <label>Action</label>
+        <choice value="create">Create</choice>
+        <choice value="delete">Delete</choice>
+        <default>create</default>
+      </input>
+  </fieldset>
+  <row>
+    <panel>
+      <title>Create Users</title>
+      <event>
+        <title>Results</title>
+        <search id="actionresults">
+          <query>|mkaccounts userlist=$userlist$ username=$username$ password=$password$ role=$role$ port=$port$ action=$action$</query>
+          <earliest>-24h@h</earliest>
+          <latest>now</latest>
+        </search>
+        <option name="list.drilldown">none</option>
+        <option name="refresh.display">progressbar</option>
+      </event>
+    </panel>
+  </row>
+</form>
